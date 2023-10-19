@@ -3,8 +3,10 @@ set -e
 
 if [ -f /app/app/main.py ]; then
     DEFAULT_MODULE_NAME=app.main
+    RESTART=/app/app/restart
 elif [ -f /app/main.py ]; then
     DEFAULT_MODULE_NAME=main
+    RESTART=/app/restart
 fi
 MODULE_NAME=${MODULE_NAME:-$DEFAULT_MODULE_NAME}
 VARIABLE_NAME=${VARIABLE_NAME:-app}
@@ -30,5 +32,11 @@ else
     echo "There is no script $PRE_START_PATH"
 fi
 
-# Start Gunicorn
-exec gunicorn -k "$WORKER_CLASS" -c "$GUNICORN_CONF" "$APP_MODULE"
+# Start Gunicorn --pid=gunicorn.pid
+exec gunicorn -k "$WORKER_CLASS" -c "$GUNICORN_CONF" --worker-tmp-dir /dev/shm "$APP_MODULE"
+
+## in terminal #2, run:
+#watchmedo shell-command \
+#  --patterns="$RESTART" \
+#  --interval=5 \
+#  --command='echo "$RESTART changed" && kill -HUP `cat gunicorn.pid`' . &

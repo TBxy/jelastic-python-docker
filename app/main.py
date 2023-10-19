@@ -11,11 +11,11 @@ class App:
             {
                 "type": "http.response.start",
                 "status": 200,
-                "headers": [[b"content-type", b"text/plain"]],
+                "headers": [[b"content-type", b"text/html"]],
             }
         )
         version = f"{sys.version_info.major}.{sys.version_info.minor}"
-        message = f"Hello World! From Uvicorn with Gunicorn. Using Python {version}".encode(
+        message = f"<h1>Hello World!</h1> From Uvicorn with Gunicorn. Using <b>Python {version}</b>".encode(
             "utf-8"
         )
         await send({"type": "http.response.body", "body": message})
